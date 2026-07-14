@@ -1,11 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { UsersService } from '../users/users.service';
-import { FamiliesService } from '../families/families.service';
-import { UserResponseDto } from '../users/dto/user-response.dto';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
+import { UsersService } from "../users/users.service";
+import { FamiliesService } from "../families/families.service";
+import { UserResponseDto } from "../users/dto/user-response.dto";
+import { RegisterDto } from "./dto/register.dto";
+import { LoginDto } from "./dto/login.dto";
 
 const SALT_ROUNDS = 10;
 
@@ -43,18 +43,22 @@ export class AuthService {
 
     return {
       user: UserResponseDto.fromEntity(user),
-      family: { id: family.id, name: family.name, inviteCode: family.inviteCode },
+      family: {
+        id: family.id,
+        name: family.name,
+        inviteCode: family.inviteCode,
+      },
     };
   }
 
   async login(dto: LoginDto): Promise<AuthResult> {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
-      throw new UnauthorizedException('No existe una cuenta con ese correo');
+      throw new UnauthorizedException("No existe una cuenta con ese correo");
     }
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) {
-      throw new UnauthorizedException('Contraseña incorrecta');
+      throw new UnauthorizedException("Contraseña incorrecta");
     }
 
     const accessToken = this.jwtService.sign({

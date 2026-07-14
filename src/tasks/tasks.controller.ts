@@ -8,14 +8,17 @@ import {
   Post,
   Query,
   UseGuards,
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser, RequestUser } from '../auth/decorators/current-user.decorator';
-import { TasksService } from './tasks.service';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+} from "@nestjs/common";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import {
+  CurrentUser,
+  RequestUser,
+} from "../auth/decorators/current-user.decorator";
+import { TasksService } from "./tasks.service";
+import { CreateTaskDto } from "./dto/create-task.dto";
+import { UpdateTaskDto } from "./dto/update-task.dto";
 
-@Controller('tasks')
+@Controller("tasks")
 @UseGuards(JwtAuthGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
@@ -30,32 +33,32 @@ export class TasksController {
     return this.tasksService.findAll(user);
   }
 
-  @Get('user/:userId')
+  @Get("user/:userId")
   findByUser(
-    @Param('userId') userId: string,
-    @Query('day') day: string | undefined,
+    @Param("userId") userId: string,
+    @Query("day") day: string | undefined,
     @CurrentUser() user: RequestUser,
   ) {
     if (day) return this.tasksService.findByUserAndDay(userId, day, user);
     return this.tasksService.findByUser(userId, user);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   update(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() dto: UpdateTaskDto,
     @CurrentUser() user: RequestUser,
   ) {
     return this.tasksService.update(id, dto, user);
   }
 
-  @Patch(':id/toggle')
-  toggleStatus(@Param('id') id: string, @CurrentUser() user: RequestUser) {
+  @Patch(":id/toggle")
+  toggleStatus(@Param("id") id: string, @CurrentUser() user: RequestUser) {
     return this.tasksService.toggleStatus(id, user);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: RequestUser) {
+  @Delete(":id")
+  remove(@Param("id") id: string, @CurrentUser() user: RequestUser) {
     return this.tasksService.remove(id, user);
   }
 }

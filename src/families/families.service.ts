@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import * as crypto from 'crypto';
-import { Family } from './entities/family.entity';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import * as crypto from "crypto";
+import { Family } from "./entities/family.entity";
 
 @Injectable()
 export class FamiliesService {
@@ -12,7 +12,7 @@ export class FamiliesService {
   ) {}
 
   private generateInviteCode(): string {
-    return crypto.randomBytes(4).toString('hex').toUpperCase(); // ej. "A1B2C3D4"
+    return crypto.randomBytes(4).toString("hex").toUpperCase();
   }
 
   async create(name: string): Promise<Family> {
@@ -28,14 +28,14 @@ export class FamiliesService {
       where: { inviteCode: code.trim().toUpperCase() },
     });
     if (!family) {
-      throw new NotFoundException('Código de invitación no válido');
+      throw new NotFoundException("Código de invitación no válido");
     }
     return family;
   }
 
   async findById(id: string): Promise<Family> {
     const family = await this.familiesRepository.findOne({ where: { id } });
-    if (!family) throw new NotFoundException('Familia no encontrada');
+    if (!family) throw new NotFoundException("Familia no encontrada");
     return family;
   }
 }

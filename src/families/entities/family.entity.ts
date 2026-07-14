@@ -4,21 +4,21 @@ import {
   Column,
   OneToMany,
   CreateDateColumn,
-} from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+} from "typeorm";
+import { User } from "../../users/entities/user.entity";
 
-@Entity('families')
+@Entity("families")
 export class Family {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: "varchar", length: 100 })
   name!: string;
 
-  @Column({ name: 'invite_code', type: 'varchar', length: 10, unique: true })
+  @Column({ name: "invite_code", type: "varchar", length: 10, unique: true })
   inviteCode!: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
 
   @OneToMany(() => User, (user) => user.family)

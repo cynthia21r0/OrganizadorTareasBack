@@ -1,7 +1,11 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User, FamilyRole } from './entities/user.entity';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User, FamilyRole } from "./entities/user.entity";
 
 @Injectable()
 export class UsersService {
@@ -13,23 +17,22 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { email: email.toLowerCase() },
-      relations: ['family'] // <-- Relación agregada
+      relations: ["family"],
     });
   }
 
   async findById(id: string): Promise<User | null> {
-    return this.usersRepository.findOne({ 
+    return this.usersRepository.findOne({
       where: { id },
-      relations: ['family'] // <-- Relación agregada
+      relations: ["family"],
     });
   }
 
-  // Ahora filtra por familia (multi-familia)
   async findAllByFamily(familyId: string): Promise<User[]> {
-    return this.usersRepository.find({ 
-      where: { familyId }, 
-      order: { name: 'ASC' },
-      relations: ['family'] // <-- Relación agregada
+    return this.usersRepository.find({
+      where: { familyId },
+      order: { name: "ASC" },
+      relations: ["family"],
     });
   }
 
@@ -43,7 +46,7 @@ export class UsersService {
     const email = data.email.toLowerCase();
     const existing = await this.findByEmail(email);
     if (existing) {
-      throw new ConflictException('Ya existe una cuenta con ese correo');
+      throw new ConflictException("Ya existe una cuenta con ese correo");
     }
 
     const user = this.usersRepository.create({
@@ -56,11 +59,10 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  // NUEVO MÉTODO PARA ACTUALIZAR LA FOTO
   async updateProfilePicture(id: string, base64Image: string): Promise<User> {
     const user = await this.findById(id);
     if (!user) {
-      throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException("Usuario no encontrado");
     }
 
     user.profilePicture = base64Image;

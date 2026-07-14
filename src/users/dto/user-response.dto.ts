@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entity';
+import { User } from "../entities/user.entity";
 
 export class UserResponseDto {
   id!: string;
@@ -7,7 +7,7 @@ export class UserResponseDto {
   role!: string;
   familyId!: string;
   profilePicture?: string;
-  familyInviteCode?: string; // <-- Nuevo campo agregado
+  familyInviteCode?: string;
 
   static fromEntity(user: User): UserResponseDto {
     const dto = new UserResponseDto();
@@ -17,12 +17,11 @@ export class UserResponseDto {
     dto.role = user.role;
     dto.familyId = user.familyId;
     dto.profilePicture = user.profilePicture;
-    
-    // Extraemos el código de invitación si la relación con la tabla 'families' está cargada
+
     if (user.family) {
       dto.familyInviteCode = user.family.inviteCode;
     }
-    
+
     return dto;
   }
 }
