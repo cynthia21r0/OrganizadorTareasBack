@@ -1,5 +1,6 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser, RequestUser } from '../auth/decorators/current-user.decorator';
 import { UsersService } from './users.service';
 import { UserResponseDto } from './dto/user-response.dto';
 
@@ -8,11 +9,10 @@ import { UserResponseDto } from './dto/user-response.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // GET /api/users -> lista de integrantes de la familia (para el dropdown
-  // de asignación y la pantalla "Familia" del Flutter)
+  // GET /api/users -> solo los integrantes de MI familia
   @Get()
-  async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.usersService.findAll();
+  async findAll(@CurrentUser() requester: RequestUser): Promise<UserResponseDto[]> {
+    const users = await this.usersService.findAllByFamily(requester.familyId);
     return users.map((u) => UserResponseDto.fromEntity(u));
   }
 }

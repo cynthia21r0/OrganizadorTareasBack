@@ -6,6 +6,8 @@ import { Task } from './tasks/entities/task.entity';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TasksModule } from './tasks/tasks.module';
+import { FamiliesModule } from './families/families.module';
+import { Family } from './families/entities/family.entity';
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ import { TasksModule } from './tasks/tasks.module';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'tareas_familiares'),
-        entities: [User, Task],
+        entities: [User, Task, Family],
         ssl: config.get<string>('DB_SSL') === 'true'
           ? { rejectUnauthorized: false }
           : false,
@@ -29,6 +31,7 @@ import { TasksModule } from './tasks/tasks.module';
         logging: false,
       }),
     }),
+    FamiliesModule,
     AuthModule,
     UsersModule,
     TasksModule,

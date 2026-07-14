@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Family } from '../../families/entities/family.entity';
 
 export enum TaskPriority {
   BAJA = 'baja',
@@ -22,37 +23,44 @@ export enum TaskStatus {
 @Entity('tasks')
 export class Task {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'varchar', length: 150 })
-  title: string;
+  title!: string;
 
   @Column({ type: 'text', nullable: true, default: '' })
-  description: string;
+  description!: string;
 
   @Column({ name: 'due_date', type: 'timestamptz' })
-  dueDate: Date;
+  dueDate!: Date;
 
   @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.MEDIA })
-  priority: TaskPriority;
+  priority!: TaskPriority;
 
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.PENDIENTE })
-  status: TaskStatus;
+  status!: TaskStatus;
 
   @ManyToOne(() => User, (user) => user.assignedTasks, { eager: true })
   @JoinColumn({ name: 'assigned_to_id' })
-  assignedTo: User;
+  assignedTo!: User;
 
   @Column({ name: 'assigned_to_id' })
-  assignedToId: string;
+  assignedToId!: string;
 
   @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'created_by_id' })
-  createdBy: User;
+  createdBy!: User;
 
   @Column({ name: 'created_by_id' })
-  createdById: string;
+  createdById!: string;
+
+  @ManyToOne(() => Family, { eager: false })
+  @JoinColumn({ name: 'family_id' })
+  family!: Family;
+
+  @Column({ name: 'family_id' })
+  familyId!: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt!: Date;
 }

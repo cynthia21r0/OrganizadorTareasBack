@@ -5,8 +5,10 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
 
 export interface JwtPayload {
-  sub: string; // id del usuario
+  sub: string;
   email: string;
+  familyId: string;
+  role: string;
 }
 
 @Injectable()
@@ -27,7 +29,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('Usuario no encontrado');
     }
-    // Esto es lo que terminará disponible en request.user
-    return { id: user.id, name: user.name, email: user.email, role: user.role };
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      familyId: user.familyId,
+    };
   }
 }
