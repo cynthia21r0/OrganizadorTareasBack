@@ -56,4 +56,7 @@ export class User {
 
   @OneToMany(() => Task, (task) => task.assignedTo)
   assignedTasks!: Task[];
+
+  @Column({ type: 'text', nullable: true, name: 'profile_picture' })
+  profilePicture!: string;
 }

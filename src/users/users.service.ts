@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, FamilyRole } from './entities/user.entity';
@@ -11,16 +11,26 @@ export class UsersService {
   ) {}
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
+    return this.usersRepository.findOne({
+      where: { email: email.toLowerCase() },
+      relations: ['family'] // <-- Relación agregada
+    });
   }
 
   async findById(id: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { id } });
+    return this.usersRepository.findOne({ 
+      where: { id },
+      relations: ['family'] // <-- Relación agregada
+    });
   }
 
   // Ahora filtra por familia (multi-familia)
   async findAllByFamily(familyId: string): Promise<User[]> {
-    return this.usersRepository.find({ where: { familyId }, order: { name: 'ASC' } });
+    return this.usersRepository.find({ 
+      where: { familyId }, 
+      order: { name: 'ASC' },
+      relations: ['family'] // <-- Relación agregada
+    });
   }
 
   async create(data: {
@@ -43,6 +53,17 @@ export class UsersService {
       role: data.role,
       familyId: data.familyId,
     });
+    return this.usersRepository.save(user);
+  }
+
+  // NUEVO MÉTODO PARA ACTUALIZAR LA FOTO
+  async updateProfilePicture(id: string, base64Image: string): Promise<User> {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    user.profilePicture = base64Image;
     return this.usersRepository.save(user);
   }
 }

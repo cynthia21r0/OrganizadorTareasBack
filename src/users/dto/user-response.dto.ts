@@ -6,6 +6,8 @@ export class UserResponseDto {
   email!: string;
   role!: string;
   familyId!: string;
+  profilePicture?: string;
+  familyInviteCode?: string; // <-- Nuevo campo agregado
 
   static fromEntity(user: User): UserResponseDto {
     const dto = new UserResponseDto();
@@ -14,6 +16,13 @@ export class UserResponseDto {
     dto.email = user.email;
     dto.role = user.role;
     dto.familyId = user.familyId;
+    dto.profilePicture = user.profilePicture;
+    
+    // Extraemos el código de invitación si la relación con la tabla 'families' está cargada
+    if (user.family) {
+      dto.familyInviteCode = user.family.inviteCode;
+    }
+    
     return dto;
   }
 }
