@@ -2,10 +2,12 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User, FamilyRole } from "./entities/user.entity";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UsersService {
@@ -68,4 +70,40 @@ export class UsersService {
     user.profilePicture = base64Image;
     return this.usersRepository.save(user);
   }
+
+  async updateProfile(
+  id: string,
+  dto: { name?: string; email?: string; password?: string; currentPassword?: string },
+): Promise<User> {
+  const user = await this.usersRepository.findOne({ where: { id } });
+  if (!user) {
+    throw new NotFoundException("Usuario no encontrado");
+  }
+
+  if (dto.name) {
+    user.name = dto.name.trim();
+  }
+
+  if (dto.email && dto.email.toLowerCase() !== user.email) {
+    const newEmail = dto.email.toLowerCase();
+    const existing = await this.findByEmail(newEmail);
+    if (existing) {
+      throw new ConflictException("Ya existe una cuenta con ese correo");
+    }
+    user.email = newEmail;
+  }
+
+  if (dto.password) {
+    const validCurrent = await bcrypt.compare(
+      dto.currentPassword ?? "",
+      user.passwordHash,
+    );
+    if (!validCurrent) {
+      throw new UnauthorizedException("La contraseña actual es incorrecta");
+    }
+    user.passwordHash = await bcrypt.hash(dto.password, 10);
+  }
+
+  return this.usersRepository.save(user);
+}
 }
