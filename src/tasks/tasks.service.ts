@@ -11,6 +11,8 @@ import { UsersService } from "../users/users.service";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";
 import { RequestUser } from "../auth/decorators/current-user.decorator";
+import { NotificationsService } from "../notifications/notifications.service";
+import { NotificationType } from "../notifications/entities/notification.entity";
 
 @Injectable()
 export class TasksService {
@@ -18,6 +20,7 @@ export class TasksService {
     @InjectRepository(Task)
     private readonly tasksRepository: Repository<Task>,
     private readonly usersService: UsersService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(dto: CreateTaskDto, requester: RequestUser): Promise<Task> {
@@ -44,7 +47,18 @@ export class TasksService {
       familyId: requester.familyId,
       status: TaskStatus.PENDIENTE,
     });
-    return this.tasksRepository.save(task);
+    const saved = await this.tasksRepository.save(task);
+
+    if (dto.assignedToId !== requester.id) {
+      await this.notificationsService.createForUser(
+        dto.assignedToId,
+        NotificationType.TASK_ASSIGNED,
+        `${requester.name} te asignó la tarea "${saved.title}"`,
+        saved.id,
+      );
+    }
+
+    return saved;
   }
 
   async findByUser(userId: string, requester: RequestUser): Promise<Task[]> {
@@ -124,11 +138,20 @@ export class TasksService {
     const task = await this.findOneOrFail(id);
     this._assertSameFamilyAndCanModify(task, requester);
 
-    task.status =
-      task.status === TaskStatus.PENDIENTE
-        ? TaskStatus.COMPLETADA
-        : TaskStatus.PENDIENTE;
-    return this.tasksRepository.save(task);
+    const wasCompleted = task.status === TaskStatus.PENDIENTE;
+    task.status = wasCompleted ? TaskStatus.COMPLETADA : TaskStatus.PENDIENTE;
+    const saved = await this.tasksRepository.save(task);
+
+    if (wasCompleted && task.createdById !== requester.id) {
+      await this.notificationsService.createForUser(
+        task.createdById,
+        NotificationType.TASK_COMPLETED,
+        `${requester.name} completó la tarea "${task.title}"`,
+        task.id,
+      );
+    }
+
+    return saved;
   }
 
   async remove(id: string, requester: RequestUser): Promise<void> {
