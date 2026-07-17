@@ -8,6 +8,10 @@ import { UsersModule } from "./users/users.module";
 import { TasksModule } from "./tasks/tasks.module";
 import { FamiliesModule } from "./families/families.module";
 import { Family } from "./families/entities/family.entity";
+import { ChatModule } from "./chat/chat.module";
+import { Message } from "./chat/entities/message.entity";
+import { NotificationsModule } from "./notifications/notifications.module";
+import { Notification } from "./notifications/entities/notification.entity";
 
 @Module({
   imports: [
@@ -21,7 +25,7 @@ import { Family } from "./families/entities/family.entity";
         username: config.get<string>("DB_USERNAME", "postgres"),
         password: config.get<string>("DB_PASSWORD", "postgres"),
         database: config.get<string>("DB_NAME", "tareas_familiares"),
-        entities: [User, Task, Family],
+        entities: [User, Task, Family, Message, Notification],
         ssl:
           config.get<string>("DB_SSL") === "true"
             ? { rejectUnauthorized: false }
@@ -31,6 +35,8 @@ import { Family } from "./families/entities/family.entity";
       }),
     }),
     FamiliesModule,
+    ChatModule,
+    NotificationsModule,
     AuthModule,
     UsersModule,
     TasksModule,
