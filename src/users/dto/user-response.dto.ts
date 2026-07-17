@@ -7,6 +7,7 @@ export class UserResponseDto {
   role!: string;
   familyId!: string;
   profilePicture?: string;
+  familyName?: string;
   familyInviteCode?: string;
 
   static fromEntity(user: User): UserResponseDto {
@@ -19,6 +20,7 @@ export class UserResponseDto {
     dto.profilePicture = user.profilePicture;
 
     if (user.family) {
+      dto.familyName = user.family.name;
       dto.familyInviteCode = user.family.inviteCode;
     }
 
